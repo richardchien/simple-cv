@@ -463,3 +463,12 @@ void scvSplit(ScvImage *src, ScvImage *b, ScvImage *g, ScvImage *r) {
         }
     }
 }
+
+void scvInverse(ScvImage *src, ScvImage *dst) {
+    for (int iy = 0; iy < src->height; iy++) {
+        for (int ix = 0; ix < src->width; ix++) {
+            ScvPixel sPxl = scvGetPixel(src, ix, iy);
+            scvSetPixel(dst, ix, iy, scvPixel(255 - sPxl.b, 255 - sPxl.g, 255 - sPxl.r));
+        }
+    }
+}

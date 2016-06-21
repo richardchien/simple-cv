@@ -67,4 +67,6 @@ void scvThreshold(ScvImage *src, ScvImage *dst, SCV_GRAYING_TYPE grayingType);
 
 void scvSplit(ScvImage *src, ScvImage *b, ScvImage *g, ScvImage *r);
 
+void scvInverse(ScvImage *src, ScvImage *dst);
+
 #endif //SIMPLECV_CORE_H
