@@ -42,10 +42,17 @@ int main() {
     scvEqualizeHist(image, imageEquHist, histogram);
     scvSaveImage(imageEquHist, "equalized_hist.bmp");
 
-    // Test filter
-    ScvImage *imageFiltered = scvCreateImage(scvGetSize(image));
-    scvFilter(image, imageFiltered, SCV_FILTER_AVG);
-    scvSaveImage(imageFiltered, "filtered.bmp");
+    // Test smooth
+    ScvImage *imageSmooth = scvCreateImage(scvGetSize(image));
+    scvSmooth(image, imageSmooth, SCV_SMOOTH_MEDIAN);
+    scvSaveImage(imageSmooth, "smooth.bmp");
+
+    // Test canny
+    ScvImage *imageCanny = scvCreateImage(scvGetSize(image));
+    ScvImage *imageGray = scvCreateImage(scvGetSize(image));
+    scvGraying(image, imageGray, SCV_GRAYING_AVG);
+    scvCanny(imageGray, imageCanny);
+    scvSaveImage(imageCanny, "canny.bmp");
 
     return 0;
 }

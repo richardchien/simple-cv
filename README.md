@@ -53,8 +53,15 @@ ScvImage *imageEquHist = scvCreateImage(scvGetSize(image));
 scvEqualizeHist(image, imageEquHist, histogram);
 scvSaveImage(imageEquHist, "equalized_hist.bmp");
 
-// Filter
-ScvImage *imageFiltered = scvCreateImage(scvGetSize(image));
-scvFilter(image, imageFiltered, SCV_FILTER_AVG);
-scvSaveImage(imageFiltered, "filtered.bmp");
+// Smooth
+ScvImage *imageSmooth = scvCreateImage(scvGetSize(image));
+scvSmooth(image, imageSmooth, SCV_SMOOTH_AVG);
+scvSaveImage(imageSmooth, "smooth.bmp");
+
+// Canny outline detection
+ScvImage *imageCanny = scvCreateImage(scvGetSize(image));
+ScvImage *imageGray = scvCreateImage(scvGetSize(image));
+scvGraying(image, imageGray, SCV_GRAYING_AVG);
+scvCanny(imageGray, imageCanny);
+scvSaveImage(imageCanny, "canny.bmp");
 ```

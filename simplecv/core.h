@@ -79,11 +79,6 @@ void scvScaleMatrix(ScvPoint center, float scaleX, float scaleY, ScvMat *mat);
 
 void scvTranslationMatrix(float dx, float dy, ScvMat *mat);
 
-typedef enum {
-    SCV_FLIP_HORIZONTAL,
-    SCV_FLIP_VERTICAL
-} SCV_FLIP_TYPE;
-
 void scvFlipMatrix(ScvPoint center, SCV_FLIP_TYPE type, ScvMat *mat);
 
 #pragma mark - Point Transformation
@@ -104,11 +99,9 @@ void scvInverse(const ScvImage *src, ScvImage *dst);
 
 void scvEqualizeHist(const ScvImage *src, ScvImage *dst, const ScvHistogram *hist);
 
-typedef enum {
-    SCV_FILTER_AVG,
-    SCV_FILTER_MED
-} SCV_FILTER_TYPE;
+void scvSmooth(const ScvImage *src, ScvImage *dst, SCV_SMOOTH_TYPE type);
 
-void scvFilter(const ScvImage *src, ScvImage *dst, SCV_FILTER_TYPE type);
+// The image passed in must be gray-scaled image.
+void scvCanny(const ScvImage *image, ScvImage *path);
 
 #endif //SIMPLECV_CORE_H

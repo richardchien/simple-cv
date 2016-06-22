@@ -129,7 +129,7 @@ typedef struct _ScvImage {
     void *data;
 } ScvImage;
 
-typedef enum {
+typedef enum _SCV_GRAYING_TYPE {
     SCV_GRAYING_R = 0,
     SCV_GRAYING_G,
     SCV_GRAYING_B,
@@ -149,5 +149,16 @@ SCV_INLINE ScvHistogram scvHistogram(SCV_GRAYING_TYPE grayingType, int val[256])
     histogram.val = val;
     return histogram;
 }
+
+typedef enum _SCV_FLIP_TYPE {
+    SCV_FLIP_HORIZONTAL,
+    SCV_FLIP_VERTICAL
+} SCV_FLIP_TYPE;
+
+typedef enum _SCV_SMOOTH_TYPE {
+    SCV_SMOOTH_AVG,
+    SCV_SMOOTH_MEDIAN,
+    SCV_SMOOTH_GAUSSIAN
+} SCV_SMOOTH_TYPE;
 
 #endif //SIMPLECV_TYPES_H
