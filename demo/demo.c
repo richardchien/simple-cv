@@ -39,7 +39,7 @@ int main() {
     ScvHistogram *histogram = scvCreateHist(SCV_GRAYING_AVG);
     scvCalcHist(image, histogram);
     ScvImage *imageEquHist = scvCreateImage(scvGetSize(image));
-    scvEqualizeHist(image, imageEquHist, histogram);
+    scvEqualizeHist(image, histogram, imageEquHist);
     scvSaveImage(imageEquHist, "equalized_hist.bmp");
 
     // Test smooth
@@ -53,6 +53,11 @@ int main() {
     scvGraying(image, imageGray, SCV_GRAYING_AVG);
     scvCanny(imageGray, imageCanny);
     scvSaveImage(imageCanny, "canny.bmp");
+
+    // Test edge enhance
+    ScvImage *imageEnhanced = scvCreateImage(scvGetSize(image));
+    scvAddWeighed(image, 0.92f, imageCanny, 0.08f, imageEnhanced);
+    scvSaveImage(imageEnhanced, "enhanced.bmp");
 
     return 0;
 }

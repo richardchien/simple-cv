@@ -97,11 +97,13 @@ void scvSplit(const ScvImage *src, ScvImage *b, ScvImage *g, ScvImage *r);
 
 void scvInverse(const ScvImage *src, ScvImage *dst);
 
-void scvEqualizeHist(const ScvImage *src, ScvImage *dst, const ScvHistogram *hist);
+void scvEqualizeHist(const ScvImage *src, const ScvHistogram *hist, ScvImage *dst);
 
 void scvSmooth(const ScvImage *src, ScvImage *dst, SCV_SMOOTH_TYPE type);
 
 // The image passed in must be gray-scaled image.
 void scvCanny(const ScvImage *image, ScvImage *path);
+
+void scvAddWeighed(const ScvImage *src1, float alpha, const ScvImage *src2, float beta, ScvImage *dst);
 
 #endif //SIMPLECV_CORE_H

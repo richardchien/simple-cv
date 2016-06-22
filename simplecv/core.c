@@ -53,11 +53,11 @@ float avgArr(int count, const int num[]) {
     return (float) sum / count;
 }
 
-float avgRGBWeighted(int r, int g, int b) {
+float avgRGBWeighed(int r, int g, int b) {
     return 0.30f * r + 0.59f * g + 0.11f * b;
 }
 
-float avgArrWeighted(int count, const int num[], const int weight[]) {
+float avgArrWeighed(int count, const int *num, const int *weight) {
     int sumWeight = 0;
     int sum = 0;
     for (int i = 0; i < count; i++) {
@@ -98,7 +98,7 @@ int grayValueOfPixel(ScvPixel pxl, SCV_GRAYING_TYPE type) {
         case SCV_GRAYING_AVG:
             return (int) (avg(pxl.r, pxl.g, pxl.b) + 0.5f);
         case SCV_GRAYING_W_AVG:
-            return (int) (avgRGBWeighted(pxl.r, pxl.g, pxl.b) + 0.5f);
+            return (int) (avgRGBWeighed(pxl.r, pxl.g, pxl.b) + 0.5f);
         default:
             return -1;
     }
@@ -532,7 +532,7 @@ void scvInverse(const ScvImage *src, ScvImage *dst) {
     }
 }
 
-void scvEqualizeHist(const ScvImage *src, ScvImage *dst, const ScvHistogram *hist) {
+void scvEqualizeHist(const ScvImage *src, const ScvHistogram *hist, ScvImage *dst) {
     int cdf[256];
     calcCDF(256, hist->val, cdf);
     int cdfMin = 0;
@@ -615,9 +615,9 @@ void scvSmooth(const ScvImage *src, ScvImage *dst, SCV_SMOOTH_TYPE type) {
             switch (type) {
                 case SCV_SMOOTH_GAUSSIAN:
                 case SCV_SMOOTH_AVG:
-                    r = (int) (avgArrWeighted(count, arrR, w) + 0.5f);
-                    g = (int) (avgArrWeighted(count, arrG, w) + 0.5f);
-                    b = (int) (avgArrWeighted(count, arrB, w) + 0.5f);
+                    r = (int) (avgArrWeighed(count, arrR, w) + 0.5f);
+                    g = (int) (avgArrWeighed(count, arrG, w) + 0.5f);
+                    b = (int) (avgArrWeighed(count, arrB, w) + 0.5f);
                     break;
                 case SCV_SMOOTH_MEDIAN:
                     r = (int) (medianArr(count, arrR) + 0.5f);
@@ -836,4 +836,31 @@ void scvCanny(const ScvImage *image, ScvImage *path) {
     free(M);
     free(theta);
     free(N);
+}
+
+void scvAddWeighed(const ScvImage *src1, float alpha, const ScvImage *src2, float beta, ScvImage *dst) {
+    float rate = 1.0f / (alpha + beta);
+    alpha *= rate;
+    beta *= rate;
+
+    for (int iy = 0; iy < dst->height; iy++) {
+        for (int ix = 0; ix < dst->width; ix++) {
+            if (ix < src1->width && iy < src1->height
+                && ix < src2->width && iy < src2->height) {
+                // In range of both src1 and src2
+                ScvPixel pxl1 = scvGetPixel(src1, ix, iy);
+                ScvPixel pxl2 = scvGetPixel(src2, ix, iy);
+                scvSetPixel(dst, ix, iy, scvPixel(
+                        (int) (alpha * pxl1.b + beta * pxl2.b),
+                        (int) (alpha * pxl1.g + beta * pxl2.g),
+                        (int) (alpha * pxl1.r + beta * pxl2.r)));
+            } else if (ix < src1->width && iy < src1->height) {
+                // In range of src1
+                scvSetPixel(dst, ix, iy, scvGetPixel(src1, ix, iy));
+            } else if (ix < src2->width && iy < src2->height) {
+                // In range of src2
+                scvSetPixel(dst, ix, iy, scvGetPixel(src2, ix, iy));
+            }
+        }
+    }
 }
