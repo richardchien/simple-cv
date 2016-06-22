@@ -35,5 +35,17 @@ int main() {
     scvInverse(image, imageInv);
     scvSaveImage(imageInv, "inv.bmp");
 
+    // Test equalize hist
+    ScvHistogram *histogram = scvCreateHist(SCV_GRAYING_AVG);
+    scvCalcHist(image, histogram);
+    ScvImage *imageEquHist = scvCreateImage(scvGetSize(image));
+    scvEqualizeHist(image, imageEquHist, histogram);
+    scvSaveImage(imageEquHist, "equalized_hist.bmp");
+
+    // Test filter
+    ScvImage *imageFiltered = scvCreateImage(scvGetSize(image));
+    scvFilter(image, imageFiltered, SCV_FILTER_AVG);
+    scvSaveImage(imageFiltered, "filtered.bmp");
+
     return 0;
 }

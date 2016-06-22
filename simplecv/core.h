@@ -70,12 +70,25 @@ void scvFlipMatrix(ScvPoint center, SCV_FLIP_TYPE type, ScvMat *mat);
 
 void scvFillImage(ScvImage *image, ScvPixel fillPxl);
 
-void scvGraying(ScvImage *src, ScvImage *dst, SCV_GRAYING_TYPE type);
+void scvGraying(const ScvImage *src, ScvImage *dst, SCV_GRAYING_TYPE type);
 
-void scvThreshold(ScvImage *src, ScvImage *dst, SCV_GRAYING_TYPE grayingType);
+/**
+ * Applies fixed-level threshold to gray-scale image.
+ * If the image is not gray-scaled, graying it with the parameter grayingType.
+ */
+void scvThreshold(const ScvImage *src, ScvImage *dst, SCV_GRAYING_TYPE grayingType);
 
-void scvSplit(ScvImage *src, ScvImage *b, ScvImage *g, ScvImage *r);
+void scvSplit(const ScvImage *src, ScvImage *b, ScvImage *g, ScvImage *r);
 
-void scvInverse(ScvImage *src, ScvImage *dst);
+void scvInverse(const ScvImage *src, ScvImage *dst);
+
+void scvEqualizeHist(const ScvImage *src, ScvImage *dst, const ScvHistogram *hist);
+
+typedef enum {
+    SCV_FILTER_AVG,
+    SCV_FILTER_MED
+} SCV_FILTER_TYPE;
+
+void scvFilter(const ScvImage *src, ScvImage *dst, SCV_FILTER_TYPE type);
 
 #endif //SIMPLECV_CORE_H

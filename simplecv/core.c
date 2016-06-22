@@ -7,8 +7,12 @@
 #include <math.h>
 #include "core.h"
 #include "matrix.h"
+#include "../LogUtils/log_utils.h"
 
 #pragma mark - Inner
+
+#define MIN(val1, val2) (val1 > val2 ? val2 : val1)
+#define MAX(val1, val2) (val1 > val2 ? val1 : val2)
 
 int max(int a, int b, int c) {
     int m = a;
@@ -21,37 +25,56 @@ float avg(int a, int b, int c) {
     return (a + b + c) / 3.0f;
 }
 
+float avgArr(int count, int num[]) {
+    int sum = 0;
+    for (int i = 0; i < count; i++) {
+        sum += num[i];
+    }
+    return (float) sum / count;
+}
+
 float avgWeighted(int r, int g, int b) {
     return 0.30f * r + 0.59f * g + 0.11f * b;
+}
+
+int compareInt(const void *a, const void *b) {
+    return *(int *) a - *(int *) b;
+}
+
+float medianArr(int count, int num[]) {
+    if (1 == count) {
+        return num[0];
+    }
+
+    qsort(num, (size_t) count, sizeof(int), &compareInt);
+    if (count % 2 == 0) {
+        int m = count / 2;
+        return ((float) num[m - 1] + num[m]) / 2.0f;
+    } else {
+        return num[count / 2];
+    }
 }
 
 int grayValueOfPixel(ScvPixel pxl, SCV_GRAYING_TYPE type) {
     switch (type) {
         case SCV_GRAYING_R:
             return pxl.r;
-            break;
         case SCV_GRAYING_G:
             return pxl.g;
-            break;
         case SCV_GRAYING_B:
             return pxl.b;
-            break;
         case SCV_GRAYING_MAX:
             return max(pxl.b, pxl.g, pxl.r);
-            break;
         case SCV_GRAYING_AVG:
-            return (int) avg(pxl.r, pxl.g, pxl.b);
-            break;
+            return (int) (avg(pxl.r, pxl.g, pxl.b) + 0.5f);
         case SCV_GRAYING_W_AVG:
-            return (int) avgWeighted(pxl.r, pxl.g, pxl.b);
-            break;
+            return (int) (avgWeighted(pxl.r, pxl.g, pxl.b) + 0.5f);
         default:
             return -1;
-            break;
     }
 }
 
-float thresholdOtsu(ScvHistogram *hist, int total) {
+float thresholdOtsu(const ScvHistogram *hist, int total) {
     // https://en.wikipedia.org/wiki/Otsu%27s_method
     int sum = 0;
     for (int i = 1; i < 256; ++i)
@@ -85,6 +108,15 @@ float thresholdOtsu(ScvHistogram *hist, int total) {
         }
     }
     return (threshold1 + threshold2) / 2.0f;
+}
+
+// Cumulative Distribution Function
+void calcCDF(int length, const int *src, int *dst) {
+    int curSum = 0;
+    for (int i = 0; i < length; i++) {
+        curSum += src[i];
+        dst[i] = curSum;
+    }
 }
 
 #pragma mark - Export
@@ -398,14 +430,14 @@ void scvFillImage(ScvImage *image, ScvPixel fillPxl) {
     }
 }
 
-void scvGraying(ScvImage *src, ScvImage *dst, SCV_GRAYING_TYPE type) {
+void scvGraying(const ScvImage *src, ScvImage *dst, SCV_GRAYING_TYPE type) {
     for (int iy = 0; iy < src->height; iy++) {
         for (int ix = 0; ix < src->width; ix++) {
             ScvPixel sPxl = scvGetPixel(src, ix, iy);
             ScvPixel *dPxlRef = scvGetPixelRef(dst, ix, iy);
             if (NULL != dPxlRef) {
                 int value = grayValueOfPixel(sPxl, type);
-                if (value >= 0) {
+                if (value >= 0 && value < 256) {
                     dPxlRef->b = dPxlRef->g = dPxlRef->r = (ScvUByte) value;
                 }
             }
@@ -413,7 +445,7 @@ void scvGraying(ScvImage *src, ScvImage *dst, SCV_GRAYING_TYPE type) {
     }
 }
 
-void scvThreshold(ScvImage *src, ScvImage *dst, SCV_GRAYING_TYPE grayingType) {
+void scvThreshold(const ScvImage *src, ScvImage *dst, SCV_GRAYING_TYPE grayingType) {
     ScvHistogram *hist = scvCreateHist(grayingType);
     scvCalcHist(src, hist);
     float thresh = thresholdOtsu(hist, src->width * src->height);
@@ -432,7 +464,7 @@ void scvThreshold(ScvImage *src, ScvImage *dst, SCV_GRAYING_TYPE grayingType) {
     }
 }
 
-void scvSplit(ScvImage *src, ScvImage *b, ScvImage *g, ScvImage *r) {
+void scvSplit(const ScvImage *src, ScvImage *b, ScvImage *g, ScvImage *r) {
     for (int iy = 0; iy < src->height; iy++) {
         for (int ix = 0; ix < src->width; ix++) {
             ScvPixel sPxl = scvGetPixel(src, ix, iy);
@@ -443,11 +475,87 @@ void scvSplit(ScvImage *src, ScvImage *b, ScvImage *g, ScvImage *r) {
     }
 }
 
-void scvInverse(ScvImage *src, ScvImage *dst) {
+void scvInverse(const ScvImage *src, ScvImage *dst) {
     for (int iy = 0; iy < src->height; iy++) {
         for (int ix = 0; ix < src->width; ix++) {
             ScvPixel sPxl = scvGetPixel(src, ix, iy);
             scvSetPixel(dst, ix, iy, scvPixel(255 - sPxl.b, 255 - sPxl.g, 255 - sPxl.r));
+        }
+    }
+}
+
+void scvEqualizeHist(const ScvImage *src, ScvImage *dst, const ScvHistogram *hist) {
+    int cdf[256];
+    calcCDF(256, hist->val, cdf);
+    int cdfMin = 0;
+    for (int i = 0; i < 256; i++) {
+        if (0 != cdf[i]) {
+            cdfMin = cdf[i];
+            break;
+        }
+    }
+
+    const int pixelCount = src->width * src->height;
+    for (int iy = 0; iy < src->height; iy++) {
+        for (int ix = 0; ix < src->width; ix++) {
+            int value = grayValueOfPixel(scvGetPixel(src, ix, iy), hist->grayingType);
+            if (value >= 0 && value < 256) {
+                // Calculate the equalized value
+                // https://en.wikipedia.org/wiki/Histogram_equalization
+                int newVal = (int) (((float) cdf[value] - cdfMin) / (pixelCount - cdfMin) * 255 + 0.5f);
+                scvSetPixel(dst, ix, iy, scvPixelAll(newVal));
+            }
+        }
+    }
+}
+
+void scvFilter(const ScvImage *src, ScvImage *dst, SCV_FILTER_TYPE type) {
+    /**
+     * Average Filter:
+     *       [ 1 1 1 ]
+     * 1/9 * [ 1 1 1 ]
+     *       [ 1 1 1 ]
+     *
+     * Median Filter:
+     *        [ 1 1 1 ]
+     * median([ 1 1 1 ])
+     *        [ 1 1 1 ]
+     */
+
+    // Skip edge
+    for (int iy = 1; iy < src->height - 1; iy++) {
+        for (int ix = 1; ix < src->width - 1; ix++) {
+            ScvPixel pLT = scvGetPixel(src, ix - 1, iy - 1);
+            ScvPixel pT = scvGetPixel(src, ix, iy - 1);
+            ScvPixel pRT = scvGetPixel(src, ix + 1, iy - 1);
+            ScvPixel pL = scvGetPixel(src, ix - 1, iy);
+            ScvPixel pC = scvGetPixel(src, ix, iy);
+            ScvPixel pR = scvGetPixel(src, ix + 1, iy);
+            ScvPixel pLB = scvGetPixel(src, ix - 1, iy + 1);
+            ScvPixel pB = scvGetPixel(src, ix, iy + 1);
+            ScvPixel pRB = scvGetPixel(src, ix + 1, iy + 1);
+            int r, g, b;
+            int arrR[9] = {pLT.r, pT.r, pRT.r, pL.r, pC.r, pR.r, pLB.r, pB.r, pRB.r};
+            int arrG[9] = {pLT.g, pT.g, pRT.g, pL.g, pC.g, pR.g, pLB.g, pB.g, pRB.g};
+            int arrB[9] = {pLT.b, pT.b, pRT.b, pL.b, pC.b, pR.b, pLB.b, pB.b, pRB.b};
+            switch (type) {
+                case SCV_FILTER_AVG:
+                    r = (int) (avgArr(9, arrR) + 0.5f);
+                    g = (int) (avgArr(9, arrG) + 0.5f);
+                    b = (int) (avgArr(9, arrB) + 0.5f);
+                    break;
+                case SCV_FILTER_MED:
+                    r = (int) (medianArr(9, arrR) + 0.5f);
+                    g = (int) (medianArr(9, arrG) + 0.5f);
+                    b = (int) (medianArr(9, arrB) + 0.5f);
+                    break;
+                default:
+                    r = g = b = -1;
+                    break;
+            }
+            if (r >= 0 && g >= 0 && b >= 0) {
+                scvSetPixel(dst, ix, iy, scvPixel(b, g, r));
+            }
         }
     }
 }

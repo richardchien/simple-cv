@@ -110,7 +110,7 @@ typedef struct _ScvImage {
 } ScvImage;
 
 typedef enum {
-    SCV_GRAYING_R,
+    SCV_GRAYING_R = 0,
     SCV_GRAYING_G,
     SCV_GRAYING_B,
     SCV_GRAYING_MAX,
