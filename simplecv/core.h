@@ -43,6 +43,8 @@ void scvSetPixel(ScvImage *image, int x, int y, ScvPixel pixel);
 
 ScvSize scvGetSize(const ScvImage *image);
 
+ScvPoint scvGetCenter(const ScvImage *image);
+
 #pragma mark - Calculator
 
 void scvCalcHist(const ScvImage *image, ScvHistogram *hist);
@@ -56,6 +58,13 @@ void scvRotationMatrix(ScvPoint center, float angle, ScvMat *mat);
 void scvScaleMatrix(ScvPoint center, float scaleX, float scaleY, ScvMat *mat);
 
 void scvTranslationMatrix(float dx, float dy, ScvMat *mat);
+
+typedef enum {
+    SCV_FLIP_HORIZONTAL,
+    SCV_FLIP_VERTICAL
+} SCV_FLIP_TYPE;
+
+void scvFlipMatrix(ScvPoint center, SCV_FLIP_TYPE type, ScvMat *mat);
 
 #pragma mark - Point Transformation
 

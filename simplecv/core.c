@@ -222,6 +222,10 @@ ScvSize scvGetSize(const ScvImage *image) {
     return size;
 }
 
+ScvPoint scvGetCenter(const ScvImage *image) {
+    return scvPoint(image->width / 2, image->height / 2);
+}
+
 #pragma mark -- Calculator
 
 void scvCalcHist(const ScvImage *image, ScvHistogram *hist) {
@@ -369,6 +373,19 @@ void scvTranslationMatrix(float dx, float dy, ScvMat *mat) {
     scvMatSetVal(mat, 1, 0, 0);
     scvMatSetVal(mat, 1, 1, 1.0f);
     scvMatSetVal(mat, 1, 2, dy);
+}
+
+void scvFlipMatrix(ScvPoint center, SCV_FLIP_TYPE type, ScvMat *mat) {
+    switch (type) {
+        case SCV_FLIP_HORIZONTAL:
+            scvScaleMatrix(center, -1.0f, 1.0f, mat);
+            break;
+        case SCV_FLIP_VERTICAL:
+            scvScaleMatrix(center, 1.0f, -1.0f, mat);
+            break;
+        default:
+            break;
+    }
 }
 
 #pragma mark -- Point Transformation

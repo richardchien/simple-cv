@@ -11,6 +11,7 @@ int main() {
     scvRotationMatrix(scvPoint(image->width / 2, image->height / 2), 30, &mat);
     scvTranslationMatrix(20, 20, &mat);
     scvScaleMatrix(scvPoint(image->width / 2, image->height / 2), -1.2f, 0.8f, &mat);
+    scvFlipMatrix(scvGetCenter(image), SCV_FLIP_HORIZONTAL, &mat);
     scvWarpAffine(image, image2, &mat, scvPixelAll(0));
     scvGraying(image2, image2, SCV_GRAYING_W_AVG);
     scvSaveImage(image2, "image2.bmp");
