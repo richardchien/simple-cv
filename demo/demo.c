@@ -1,7 +1,7 @@
 #include "scv.h"
 
 int main() {
-    ScvImage *image = scvLoadImage("out.bmp");
+    ScvImage *image = scvLoadImage("image.bmp");
 
     // Test matrix transformation
     ScvImage *image2 = scvCreateImage(scvGetSize(image));
@@ -32,7 +32,7 @@ int main() {
     // Test inverse
     ScvImage *imageInv = scvCreateImage(scvGetSize(image));
     scvInverse(image, imageInv);
-    scvSaveImage(imageInv, "imgInv.bmp");
+    scvSaveImage(imageInv, "inv.bmp");
 
     return 0;
 }

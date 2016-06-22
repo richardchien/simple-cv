@@ -25,6 +25,32 @@ float avgWeighted(int r, int g, int b) {
     return 0.30f * r + 0.59f * g + 0.11f * b;
 }
 
+int grayValueOfPixel(ScvPixel pxl, SCV_GRAYING_TYPE type) {
+    switch (type) {
+        case SCV_GRAYING_R:
+            return pxl.r;
+            break;
+        case SCV_GRAYING_G:
+            return pxl.g;
+            break;
+        case SCV_GRAYING_B:
+            return pxl.b;
+            break;
+        case SCV_GRAYING_MAX:
+            return max(pxl.b, pxl.g, pxl.r);
+            break;
+        case SCV_GRAYING_AVG:
+            return (int) avg(pxl.r, pxl.g, pxl.b);
+            break;
+        case SCV_GRAYING_W_AVG:
+            return (int) avgWeighted(pxl.r, pxl.g, pxl.b);
+            break;
+        default:
+            return -1;
+            break;
+    }
+}
+
 float thresholdOtsu(ScvHistogram *hist, int total) {
     // https://en.wikipedia.org/wiki/Otsu%27s_method
     int sum = 0;
@@ -203,30 +229,7 @@ void scvCalcHist(const ScvImage *image, ScvHistogram *hist) {
     for (int iy = 0; iy < image->height; iy++) {
         for (int ix = 0; ix < image->width; ix++) {
             ScvPixel pxl = scvGetPixel(image, ix, iy);
-            int index;
-            switch (hist->grayingType) {
-                case SCV_GRAYING_R:
-                    index = pxl.r;
-                    break;
-                case SCV_GRAYING_G:
-                    index = pxl.g;
-                    break;
-                case SCV_GRAYING_B:
-                    index = pxl.b;
-                    break;
-                case SCV_GRAYING_MAX:
-                    index = max(pxl.b, pxl.g, pxl.r);
-                    break;
-                case SCV_GRAYING_AVG:
-                    index = (pxl.r + pxl.g + pxl.b) / 3;
-                    break;
-                case SCV_GRAYING_W_AVG:
-                    index = (int) (0.30f * pxl.r + 0.59f * pxl.g + 0.11f * pxl.b);
-                    break;
-                default:
-                    index = -1;
-                    break;
-            }
+            int index = grayValueOfPixel(pxl, hist->grayingType);
             if (index >= 0 && index < 256) {
                 hist->val[index]++;
             }
@@ -384,27 +387,9 @@ void scvGraying(ScvImage *src, ScvImage *dst, SCV_GRAYING_TYPE type) {
             ScvPixel sPxl = scvGetPixel(src, ix, iy);
             ScvPixel *dPxlRef = scvGetPixelRef(dst, ix, iy);
             if (NULL != dPxlRef) {
-                switch (type) {
-                    case SCV_GRAYING_R:
-                        dPxlRef->b = dPxlRef->g = dPxlRef->r = sPxl.r;
-                        break;
-                    case SCV_GRAYING_G:
-                        dPxlRef->b = dPxlRef->g = dPxlRef->r = sPxl.g;
-                        break;
-                    case SCV_GRAYING_B:
-                        dPxlRef->b = dPxlRef->g = dPxlRef->r = sPxl.b;
-                        break;
-                    case SCV_GRAYING_MAX:
-                        dPxlRef->b = dPxlRef->g = dPxlRef->r = (ScvUByte) max(sPxl.b, sPxl.g, sPxl.r);
-                        break;
-                    case SCV_GRAYING_AVG:
-                        dPxlRef->b = dPxlRef->g = dPxlRef->r = (ScvUByte) avg(sPxl.r, sPxl.g, sPxl.b);
-                        break;
-                    case SCV_GRAYING_W_AVG:
-                        dPxlRef->b = dPxlRef->g = dPxlRef->r = (ScvUByte) avgWeighted(sPxl.r, sPxl.g, sPxl.b);
-                        break;
-                    default:
-                        break;
+                int value = grayValueOfPixel(sPxl, type);
+                if (value >= 0) {
+                    dPxlRef->b = dPxlRef->g = dPxlRef->r = (ScvUByte) value;
                 }
             }
         }
@@ -421,30 +406,7 @@ void scvThreshold(ScvImage *src, ScvImage *dst, SCV_GRAYING_TYPE grayingType) {
             ScvPixel sPxl = scvGetPixel(src, ix, iy);
             ScvPixel *dPxlRef = scvGetPixelRef(dst, ix, iy);
             if (NULL != dPxlRef) {
-                int value;
-                switch (grayingType) {
-                    case SCV_GRAYING_R:
-                        value = sPxl.r;
-                        break;
-                    case SCV_GRAYING_G:
-                        value = sPxl.g;
-                        break;
-                    case SCV_GRAYING_B:
-                        value = sPxl.b;
-                        break;
-                    case SCV_GRAYING_MAX:
-                        value = max(sPxl.b, sPxl.g, sPxl.r);
-                        break;
-                    case SCV_GRAYING_AVG:
-                        value = (int) avg(sPxl.r, sPxl.g, sPxl.b);
-                        break;
-                    case SCV_GRAYING_W_AVG:
-                        value = (int) avgWeighted(sPxl.r, sPxl.g, sPxl.b);
-                        break;
-                    default:
-                        value = -1;
-                        break;
-                }
+                int value = grayValueOfPixel(sPxl, grayingType);
                 if (value >= 0 && value < 256) {
                     dPxlRef->b = dPxlRef->g = dPxlRef->r = (ScvUByte) (value > thresh ? 255 : 0);
                 }
