@@ -1,4 +1,24 @@
 //
+// Copyright (c) 2016 Richard Chien
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of
+// this software and associated documentation files (the "Software"), to deal in
+// the Software without restriction, including without limitation the rights to
+// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+// the Software, and to permit persons to whom the Software is furnished to do so,
+// subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+//
 // Created by Richard Chien on 6/20/16.
 //
 
@@ -7,7 +27,6 @@
 #include <math.h>
 #include "core.h"
 #include "matrix.h"
-#include "../LogUtils/log_utils.h"
 
 #pragma mark - Inner
 
@@ -522,32 +541,44 @@ void scvFilter(const ScvImage *src, ScvImage *dst, SCV_FILTER_TYPE type) {
      *        [ 1 1 1 ]
      */
 
-    // Skip edge
-    for (int iy = 1; iy < src->height - 1; iy++) {
-        for (int ix = 1; ix < src->width - 1; ix++) {
-            ScvPixel pLT = scvGetPixel(src, ix - 1, iy - 1);
-            ScvPixel pT = scvGetPixel(src, ix, iy - 1);
-            ScvPixel pRT = scvGetPixel(src, ix + 1, iy - 1);
-            ScvPixel pL = scvGetPixel(src, ix - 1, iy);
-            ScvPixel pC = scvGetPixel(src, ix, iy);
-            ScvPixel pR = scvGetPixel(src, ix + 1, iy);
-            ScvPixel pLB = scvGetPixel(src, ix - 1, iy + 1);
-            ScvPixel pB = scvGetPixel(src, ix, iy + 1);
-            ScvPixel pRB = scvGetPixel(src, ix + 1, iy + 1);
-            int r, g, b;
-            int arrR[9] = {pLT.r, pT.r, pRT.r, pL.r, pC.r, pR.r, pLB.r, pB.r, pRB.r};
-            int arrG[9] = {pLT.g, pT.g, pRT.g, pL.g, pC.g, pR.g, pLB.g, pB.g, pRB.g};
-            int arrB[9] = {pLT.b, pT.b, pRT.b, pL.b, pC.b, pR.b, pLB.b, pB.b, pRB.b};
+    int next[9][2] = {{-1, -1},
+                      {0,  -1},
+                      {1,  -1},
+                      {-1, 0},
+                      {0,  0},
+                      {1,  0},
+                      {-1, 1},
+                      {0,  1},
+                      {1,  1}};
+
+    int r, g, b;
+    int arrR[9], arrG[9], arrB[9];
+    for (int iy = 0; iy < src->height; iy++) {
+        for (int ix = 0; ix < src->width; ix++) {
+            int count = 0;
+            for (int i = 0; i < 9; i++) {
+                int curX = ix + next[i][0];
+                int curY = iy + next[i][1];
+                if (curX >= 0 && curX < src->width
+                    && curY >= 0 && curY < src->height) {
+                    ScvPixel pxl = scvGetPixel(src, curX, curY);
+                    arrR[count] = pxl.r;
+                    arrG[count] = pxl.g;
+                    arrB[count] = pxl.b;
+                    count++;
+                }
+            }
+
             switch (type) {
                 case SCV_FILTER_AVG:
-                    r = (int) (avgArr(9, arrR) + 0.5f);
-                    g = (int) (avgArr(9, arrG) + 0.5f);
-                    b = (int) (avgArr(9, arrB) + 0.5f);
+                    r = (int) (avgArr(count, arrR) + 0.5f);
+                    g = (int) (avgArr(count, arrG) + 0.5f);
+                    b = (int) (avgArr(count, arrB) + 0.5f);
                     break;
                 case SCV_FILTER_MED:
-                    r = (int) (medianArr(9, arrR) + 0.5f);
-                    g = (int) (medianArr(9, arrG) + 0.5f);
-                    b = (int) (medianArr(9, arrB) + 0.5f);
+                    r = (int) (medianArr(count, arrR) + 0.5f);
+                    g = (int) (medianArr(count, arrG) + 0.5f);
+                    b = (int) (medianArr(count, arrB) + 0.5f);
                     break;
                 default:
                     r = g = b = -1;
