@@ -31,7 +31,11 @@
 typedef signed char Int8;
 typedef short Int16;
 typedef int Int32;
+#ifdef _WIN32
+typedef __int64 Int64;
+#else
 typedef long long Int64;
+#endif
 
 #pragma pack(push)
 #pragma pack(2)

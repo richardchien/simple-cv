@@ -97,10 +97,10 @@ void scvMatInverse(const ScvMat *src, ScvMat *dst) {
 
     const int n = src->rows;
     float det = scvMatDet(src);
-    float temp[n * n];
-    ScvMat adj = scvMat(n, n, temp);
-    scvMatAdjugate(src, &adj);
-    scvMatNumProduct(1 / det, &adj, dst);
+    ScvMat *adj = scvCreateMat(n, n);
+    scvMatAdjugate(src, adj);
+    scvMatNumProduct(1 / det, adj, dst);
+    scvReleaseMat(adj);
 }
 
 float scvMatDet(const ScvMat *mat) {
@@ -128,11 +128,11 @@ float scvMatDet(const ScvMat *mat) {
     float result = 0;
     int sign = 1;
     for (int i = 0; i < mat->rows; i++) {
-        float curM[minorRows * minorRows];
-        ScvMat curMinor = scvMat(minorRows, minorRows, curM);
-        scvMatMinor(mat, &curMinor, i, 0);
-        result += scvMatGetVal(mat, i, 0) * sign * scvMatDet(&curMinor);
+        ScvMat *curMinor = scvCreateMat(minorRows, minorRows);
+        scvMatMinor(mat, curMinor, i, 0);
+        result += scvMatGetVal(mat, i, 0) * sign * scvMatDet(curMinor);
         sign = -sign;
+        scvReleaseMat(curMinor);
     }
     return result;
 }
@@ -178,15 +178,15 @@ void scvMatAdjugate(const ScvMat *src, ScvMat *dst) {
     }
 
     const int n = dst->rows;
-    float m[n * n];
-    ScvMat minor = scvMat(n - 1, n - 1, m);
+    ScvMat *minor = scvCreateMat(n - 1, n - 1);
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             int sign = (i + j) % 2 == 0 ? 1 : -1;
-            scvMatMinor(src, &minor, j, i);
-            scvMatSetVal(dst, i, j, sign * scvMatDet(&minor));
+            scvMatMinor(src, minor, j, i);
+            scvMatSetVal(dst, i, j, sign * scvMatDet(minor));
         }
     }
+    scvReleaseMat(minor);
 
     if (cloned) {
         scvReleaseMat((ScvMat *) src);

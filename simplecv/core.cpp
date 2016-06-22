@@ -25,12 +25,12 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <math.h>
-#include <printf.h>
 #include "core.h"
 #include "matrix.h"
 
 #pragma mark - Inner
 
+#define PI 3.14159265
 #define MIN(val1, val2) ((val1) > (val2) ? (val2) : (val1))
 #define MAX(val1, val2) ((val1) > (val2) ? (val1) : (val2))
 
@@ -107,7 +107,8 @@ int grayValueOfPixel(ScvPixel pxl, SCV_GRAYING_TYPE type) {
 float thresholdOtsu(const ScvHistogram *hist, int total) {
     // https://en.wikipedia.org/wiki/Otsu%27s_method
     int sum = 0;
-    for (int i = 1; i < 256; ++i) {
+	int i;
+    for (i = 1; i < 256; ++i) {
         sum += i * hist->val[i];
     }
     int sumB = 0;
@@ -119,7 +120,7 @@ float thresholdOtsu(const ScvHistogram *hist, int total) {
     float between;
     float threshold1 = 0.0;
     float threshold2 = 0.0;
-    for (int i = 0; i < 256; ++i) {
+    for (i = 0; i < 256; ++i) {
         wB += hist->val[i];
         if (wB == 0) {
             continue;
@@ -172,7 +173,7 @@ void traceEdge(int y, int x, int nThrLow, ScvUByte *pResult, int *pMag, ScvSize 
 #pragma mark -- Make
 
 ScvImage *scvCreateImage(ScvSize size) {
-    ScvImage *image = malloc(sizeof(ScvImage));
+    ScvImage *image = (ScvImage *) malloc(sizeof(ScvImage));
     image->origin = 0;
     image->width = size.width;
     image->height = size.height;
@@ -204,10 +205,10 @@ void scvReleaseImage(ScvImage *image) {
 }
 
 ScvMat *scvCreateMat(int rows, int cols) {
-    ScvMat *mat = malloc(sizeof(ScvMat));
+    ScvMat *mat = (ScvMat *) malloc(sizeof(ScvMat));
     mat->rows = rows;
     mat->cols = cols;
-    mat->data = malloc(rows * cols * sizeof(float));
+    mat->data = (float *) malloc(rows * cols * sizeof(float));
     return mat;
 }
 
@@ -231,9 +232,9 @@ void scvReleaseMat(ScvMat *mat) {
 }
 
 ScvHistogram *scvCreateHist(SCV_GRAYING_TYPE grayingType) {
-    ScvHistogram *histogram = malloc(sizeof(ScvHistogram));
+    ScvHistogram *histogram = (ScvHistogram *) malloc(sizeof(ScvHistogram));
     histogram->grayingType = grayingType;
-    histogram->val = malloc(256 * sizeof(int));
+    histogram->val = (int *) malloc(256 * sizeof(int));
     memset(histogram->val, 0, 256 * sizeof(int));
     return histogram;
 }
@@ -246,7 +247,7 @@ ScvHistogram *scvCloneHist(const ScvHistogram *histogram) {
 
 void scvCopyHist(const ScvHistogram *src, ScvHistogram *dst) {
     dst->grayingType = src->grayingType;
-    memset(dst->val, src->val, 256 * sizeof(int));
+    memcpy(dst->val, src->val, 256 * sizeof(int));
 }
 
 void scvReleaseHist(ScvHistogram *histogram) {
@@ -267,7 +268,7 @@ ScvPixel *scvGetPixelRef(const ScvImage *image, int x, int y) {
     }
 
     // Offer different offset by image.origin
-    return image->data + (o ? h - 1 - y : y) * bW + x * 3;
+    return (ScvPixel *) ((char *) image->data + (o ? h - 1 - y : y) * bW + x * 3);
 }
 
 ScvPixel scvGetPixel(const ScvImage *image, int x, int y) {
@@ -400,7 +401,7 @@ void scvRotationMatrix(ScvPoint center, float angle, ScvMat *mat) {
         return;
     }
 
-    const float rad = (float) (angle / 180 * M_PI);
+    const float rad = (float) (angle / 180 * PI);
     const float cos = cosf(rad);
     const float sin = sinf(rad);
     const int cx = center.x;
@@ -649,10 +650,10 @@ void scvCanny(const ScvImage *image, ScvImage *path) {
     int nWidth = image->width;
     int nHeight = image->height;
 
-    float *P = malloc(nWidth * nHeight * sizeof(float));
-    float *Q = malloc(nWidth * nHeight * sizeof(float));
-    int *M = malloc(nWidth * nHeight * sizeof(int));
-    float *theta = malloc(nWidth * nHeight * sizeof(float));
+    float *P = (float *) malloc(nWidth * nHeight * sizeof(float));
+    float *Q = (float *) malloc(nWidth * nHeight * sizeof(float));
+    int *M = (int *) malloc(nWidth * nHeight * sizeof(int));
+    float *theta = (float *) malloc(nWidth * nHeight * sizeof(float));
 
     for (iy = 0; iy < nHeight - 1; iy++) {
         for (ix = 0; ix < nWidth - 1; ix++) {
@@ -677,7 +678,7 @@ void scvCanny(const ScvImage *image, ScvImage *path) {
         }
     }
 
-    ScvUByte *N = malloc(nWidth * nHeight * sizeof(ScvUByte));
+    ScvUByte *N = (ScvUByte *) malloc(nWidth * nHeight * sizeof(ScvUByte));
     int g1 = 0, g2 = 0, g3 = 0, g4 = 0;
     float dTmp1 = 0.0, dTmp2 = 0.0;
     float dWeight;
