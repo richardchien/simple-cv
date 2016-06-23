@@ -63,7 +63,7 @@ typedef struct _BitmapInfoHeader {
 
 #pragma pack(pop)
 
-BOOL saveImageToBmp(ScvImage *image, const char *filename) {
+ScvBool saveImageToBmp(ScvImage *image, const char *filename) {
     int imageByteCount = image->widthBytes * image->height;
 
     BitmapFileHeader fileHeader = {0};
@@ -86,9 +86,9 @@ BOOL saveImageToBmp(ScvImage *image, const char *filename) {
         fwrite(&infoHeader, sizeof(BitmapInfoHeader), 1, bmpFile);
         fwrite(image->data, (size_t) imageByteCount, 1, bmpFile);
         fclose(bmpFile);
-        return TRUE;
+        return SCV_TRUE;
     }
-    return FALSE;
+    return SCV_FALSE;
 }
 
 ScvImage *readImageFromBmp(const char *filename) {
@@ -121,6 +121,6 @@ ScvImage *scvLoadImage(const char *filename) {
     return readImageFromBmp(filename);
 }
 
-BOOL scvSaveImage(ScvImage *image, const char *filename) {
+ScvBool scvSaveImage(ScvImage *image, const char *filename) {
     return saveImageToBmp(image, filename);
 }

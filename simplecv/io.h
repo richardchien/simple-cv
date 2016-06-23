@@ -29,6 +29,6 @@
 
 ScvImage *scvLoadImage(const char *filename);
 
-BOOL scvSaveImage(ScvImage *image, const char *filename);
+ScvBool scvSaveImage(ScvImage *image, const char *filename);
 
 #endif //SIMPLECV_IO_H

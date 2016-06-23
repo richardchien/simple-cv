@@ -37,9 +37,9 @@
 
 typedef signed char ScvByte;
 typedef unsigned char ScvUByte;
-typedef enum {
-    FALSE, TRUE
-} BOOL;
+typedef int ScvBool;
+#define SCV_FALSE 0
+#define SCV_TRUE 1
 
 #pragma pack(1)
 
