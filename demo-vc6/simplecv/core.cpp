@@ -710,7 +710,7 @@ void scvCanny(const ScvImage *image, ScvImage *path) {
                     g2 = M[nPointIdx - nWidth];
                     g3 = M[nPointIdx + nWidth];
                     g4 = M[nPointIdx + nWidth + 1];
-                    dWeight = fabsf(P[nPointIdx]) / fabsf(Q[nPointIdx]);   //反正切
+                    dWeight = fabsf(P[nPointIdx]) / fabsf(Q[nPointIdx]);
                     dTmp1 = g1 * dWeight + g2 * (1 - dWeight);
                     dTmp2 = g4 * dWeight + g3 * (1 - dWeight);
                 }
@@ -725,7 +725,7 @@ void scvCanny(const ScvImage *image, ScvImage *path) {
                     g2 = M[nPointIdx - 1];
                     g3 = M[nPointIdx + 1];
                     g4 = M[nPointIdx + nWidth + 1];
-                    dWeight = fabsf(Q[nPointIdx]) / fabsf(P[nPointIdx]);   //正切
+                    dWeight = fabsf(Q[nPointIdx]) / fabsf(P[nPointIdx]);
                     dTmp1 = g2 * dWeight + g1 * (1 - dWeight);
                     dTmp2 = g4 * dWeight + g3 * (1 - dWeight);
                 }
@@ -740,7 +740,7 @@ void scvCanny(const ScvImage *image, ScvImage *path) {
                     g2 = M[nPointIdx - nWidth + 1];
                     g3 = M[nPointIdx + nWidth];
                     g4 = M[nPointIdx + nWidth - 1];
-                    dWeight = fabsf(P[nPointIdx]) / fabsf(Q[nPointIdx]);   //反正切
+                    dWeight = fabsf(P[nPointIdx]) / fabsf(Q[nPointIdx]);
                     dTmp1 = g2 * dWeight + g1 * (1 - dWeight);
                     dTmp2 = g3 * dWeight + g4 * (1 - dWeight);
                 }
@@ -755,7 +755,7 @@ void scvCanny(const ScvImage *image, ScvImage *path) {
                     g2 = M[nPointIdx + 1];
                     g3 = M[nPointIdx + nWidth - 1];
                     g4 = M[nPointIdx - 1];
-                    dWeight = fabsf(Q[nPointIdx]) / fabsf(P[nPointIdx]);   //正切
+                    dWeight = fabsf(Q[nPointIdx]) / fabsf(P[nPointIdx]);
                     dTmp1 = g1 * dWeight + g2 * (1 - dWeight);
                     dTmp2 = g3 * dWeight + g4 * (1 - dWeight);
                 }
