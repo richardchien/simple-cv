@@ -181,7 +181,7 @@ ScvImage *scvCreateImage(ScvSize size) {
     image->widthBytes = realWidthBytes % 4 ? ((realWidthBytes >> 2) + 1) << 2 : realWidthBytes;
     const int dataSize = image->widthBytes * image->height;
     image->data = malloc((size_t) dataSize);
-    memset(image->data, 0, dataSize);
+    memset(image->data, 0, (size_t) dataSize);
     return image;
 }
 
@@ -196,7 +196,7 @@ void scvCopyImage(const ScvImage *src, ScvImage *dst) {
     dst->width = src->width;
     dst->height = src->height;
     dst->widthBytes = src->widthBytes;
-    memcpy(dst->data, src->data, src->widthBytes * src->height);
+    memcpy(dst->data, src->data, (size_t) (src->widthBytes * src->height));
 }
 
 void scvReleaseImage(ScvImage *image) {
