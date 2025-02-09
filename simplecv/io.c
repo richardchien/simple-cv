@@ -23,8 +23,9 @@
 //
 
 #include <stdio.h>
-#include "io.h"
+
 #include "core.h"
+#include "io.h"
 
 #pragma mark - Inner
 
@@ -84,7 +85,7 @@ ScvBool saveImageToBmp(ScvImage *image, const char *filename) {
     if (NULL != bmpFile) {
         fwrite(&fileHeader, sizeof(BitmapFileHeader), 1, bmpFile);
         fwrite(&infoHeader, sizeof(BitmapInfoHeader), 1, bmpFile);
-        fwrite(image->data, (size_t) imageByteCount, 1, bmpFile);
+        fwrite(image->data, (size_t)imageByteCount, 1, bmpFile);
         fclose(bmpFile);
         return SCV_TRUE;
     }
@@ -105,11 +106,10 @@ ScvImage *readImageFromBmp(const char *filename) {
 
     const int h = infoHeader.biHeight;
     int origin = h > 0 ? 1 : 0;
-    ScvImage *image = scvCreateImage(
-            scvSize(infoHeader.biWidth, h > 0 ? h : -h));
+    ScvImage *image = scvCreateImage(scvSize(infoHeader.biWidth, h > 0 ? h : -h));
     image->origin = origin;
 
-    fread(image->data, (size_t) infoHeader.biSizeImage, 1, fp);
+    fread(image->data, (size_t)infoHeader.biSizeImage, 1, fp);
 
     fclose(fp);
     return image;
@@ -117,10 +117,6 @@ ScvImage *readImageFromBmp(const char *filename) {
 
 #pragma mark - Export
 
-ScvImage *scvLoadImage(const char *filename) {
-    return readImageFromBmp(filename);
-}
+ScvImage *scvLoadImage(const char *filename) { return readImageFromBmp(filename); }
 
-ScvBool scvSaveImage(ScvImage *image, const char *filename) {
-    return saveImageToBmp(image, filename);
-}
+ScvBool scvSaveImage(ScvImage *image, const char *filename) { return saveImageToBmp(image, filename); }

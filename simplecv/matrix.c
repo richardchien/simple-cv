@@ -69,10 +69,10 @@ void scvMatDotProduct(const ScvMat *left, const ScvMat *right, ScvMat *dst) {
     }
 
     if (cloned & (1 << 1)) {
-        scvReleaseMat((ScvMat *) left);
+        scvReleaseMat((ScvMat *)left);
     }
     if (cloned & 1) {
-        scvReleaseMat((ScvMat *) right);
+        scvReleaseMat((ScvMat *)right);
     }
 }
 
@@ -120,8 +120,8 @@ float scvMatDet(const ScvMat *mat) {
 
     if (3 == mat->rows) {
         float *m = mat->data;
-        return m[0] * m[4] * m[8] + m[3] * m[7] * m[2] + m[6] * m[1] * m[5]
-               - m[2] * m[4] * m[6] - m[5] * m[7] * m[0] - m[8] * m[1] * m[3];
+        return m[0] * m[4] * m[8] + m[3] * m[7] * m[2] + m[6] * m[1] * m[5] - m[2] * m[4] * m[6] - m[5] * m[7] * m[0]
+               - m[8] * m[1] * m[3];
     }
 
     const int minorRows = mat->rows - 1;
@@ -189,7 +189,7 @@ void scvMatAdjugate(const ScvMat *src, ScvMat *dst) {
     scvReleaseMat(minor);
 
     if (cloned) {
-        scvReleaseMat((ScvMat *) src);
+        scvReleaseMat((ScvMat *)src);
     }
 }
 
@@ -212,6 +212,6 @@ void scvMatTranspose(const ScvMat *src, ScvMat *dst) {
     }
 
     if (cloned) {
-        scvReleaseMat((ScvMat *) src);
+        scvReleaseMat((ScvMat *)src);
     }
 }

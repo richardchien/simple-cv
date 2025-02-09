@@ -25,8 +25,8 @@
 #ifndef SIMPLECV_SCV_H
 #define SIMPLECV_SCV_H
 
-#include "types.h"
 #include "core.h"
 #include "io.h"
+#include "types.h"
 
-#endif //SIMPLECV_SCV_H
+#endif // SIMPLECV_SCV_H

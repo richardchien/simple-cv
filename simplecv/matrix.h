@@ -45,4 +45,4 @@ void scvMatAdjugate(const ScvMat *src, ScvMat *dst);
 
 void scvMatTranspose(const ScvMat *src, ScvMat *dst);
 
-#endif //SIMPLECV_MATRIX_H
+#endif // SIMPLECV_MATRIX_H

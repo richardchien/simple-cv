@@ -26,13 +26,13 @@
 #define SIMPLECV_TYPES_H
 
 #ifndef SCV_INLINE
-#  if defined __cplusplus
-#    define SCV_INLINE inline
-#  elif defined _MSC_VER
-#    define SCV_INLINE __inline
-#  else
-#    define SCV_INLINE static
-#  endif
+#if defined __cplusplus
+#define SCV_INLINE inline
+#elif defined _MSC_VER
+#define SCV_INLINE __inline
+#else
+#define SCV_INLINE static
+#endif
 #endif // SCV_INLINE
 
 typedef signed char ScvByte;
@@ -41,6 +41,7 @@ typedef int ScvBool;
 #define SCV_FALSE 0
 #define SCV_TRUE 1
 
+#pragma pack(push)
 #pragma pack(1)
 
 typedef struct _ScvPoint {
@@ -81,9 +82,6 @@ SCV_INLINE ScvMat scvMat(int rows, int cols, float *data) {
     return mat;
 }
 
-#pragma pack(push)
-#pragma pack(1)
-
 typedef struct _ScvPixel {
     ScvUByte b;
     ScvUByte g;
@@ -94,17 +92,17 @@ typedef struct _ScvPixel {
 
 SCV_INLINE ScvPixel scvPixel(int b, int g, int r) {
     ScvPixel pixel;
-    pixel.b = (ScvUByte) b;
-    pixel.g = (ScvUByte) g;
-    pixel.r = (ScvUByte) r;
+    pixel.b = (ScvUByte)b;
+    pixel.g = (ScvUByte)g;
+    pixel.r = (ScvUByte)r;
     return pixel;
 }
 
 SCV_INLINE ScvPixel scvPixelAll(int bgr) {
     ScvPixel pixel;
-    pixel.b = (ScvUByte) bgr;
-    pixel.g = (ScvUByte) bgr;
-    pixel.r = (ScvUByte) bgr;
+    pixel.b = (ScvUByte)bgr;
+    pixel.g = (ScvUByte)bgr;
+    pixel.r = (ScvUByte)bgr;
     return pixel;
 }
 
@@ -150,15 +148,8 @@ SCV_INLINE ScvHistogram scvHistogram(SCV_GRAYING_TYPE grayingType, int val[256])
     return histogram;
 }
 
-typedef enum _SCV_FLIP_TYPE {
-    SCV_FLIP_HORIZONTAL,
-    SCV_FLIP_VERTICAL
-} SCV_FLIP_TYPE;
+typedef enum _SCV_FLIP_TYPE { SCV_FLIP_HORIZONTAL, SCV_FLIP_VERTICAL } SCV_FLIP_TYPE;
 
-typedef enum _SCV_SMOOTH_TYPE {
-    SCV_SMOOTH_AVG,
-    SCV_SMOOTH_MEDIAN,
-    SCV_SMOOTH_GAUSSIAN
-} SCV_SMOOTH_TYPE;
+typedef enum _SCV_SMOOTH_TYPE { SCV_SMOOTH_AVG, SCV_SMOOTH_MEDIAN, SCV_SMOOTH_GAUSSIAN } SCV_SMOOTH_TYPE;
 
-#endif //SIMPLECV_TYPES_H
+#endif // SIMPLECV_TYPES_H

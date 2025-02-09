@@ -106,4 +106,4 @@ void scvCanny(const ScvImage *image, ScvImage *path);
 
 void scvAddWeighed(const ScvImage *src1, float alpha, const ScvImage *src2, float beta, ScvImage *dst);
 
-#endif //SIMPLECV_CORE_H
+#endif // SIMPLECV_CORE_H

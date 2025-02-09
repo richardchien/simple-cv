@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 
-add_library(SimpleCV types.h core.h core.cpp io.cpp io.h scv.h matrix.cpp matrix.h)
+add_library(SimpleCV core.c io.c matrix.c)
 target_include_directories(SimpleCV PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

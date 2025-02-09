@@ -2,22 +2,13 @@
 
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://github.com/richardchien/simple-cv/blob/master/LICENSE)
 
-A stupidly simple image processing library written in C. The API is similar to OpenCV. It's just for fun, and not recommended for any serious use.
+C 语言课程设计选了图像处理的题，要求只能使用 OpenCV 读取图片，不能调用其它处理图片的函数，（反正无聊），于是索性参照 OpenCV 的接口，自己实现了一个简易的 SimpleCV，功能很有限，且算法效率并不高，仅仅是按照课程设计的需求来的。
 
-## Features
+代码本身是用纯 C 写的，然而为了照顾到万恶的老古董 VC6.0，源文件改成 cpp 会更容易兼容一些。
 
-- Load and save 24-bit BMP images
-- Matrix transformation
-- Pixel manipulation
-- Graying
-- Threshold / Binarization
-- Split RGB
-- Inverse
-- Equalize hist
-- Smooth
-- Canny outline detection
+注意：现在只能读写 8 位 3 通道的 24 位 BMP 文件，为了保证可用，最好用 Windows 自带的画图程序创建图片，然后粘贴来源，并保存成 24 位位图格式。
 
-## Usage
+## 用法
 
 ```c
 ScvImage *image = scvLoadImage("image.bmp");

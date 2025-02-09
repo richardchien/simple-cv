@@ -1,2 +1,7 @@
 .idea
-*.bmp
+.vs
+.vscode
+build
+
+images/*.bmp
+!images/demo.bmp

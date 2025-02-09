@@ -22,9 +22,10 @@
 // Created by Richard Chien on 6/20/16.
 //
 
-#include <stdlib.h>
-#include <memory.h>
 #include <math.h>
+#include <memory.h>
+#include <stdlib.h>
+
 #include "core.h"
 #include "matrix.h"
 
@@ -41,21 +42,17 @@ int max(int a, int b, int c) {
     return m;
 }
 
-float avg(int a, int b, int c) {
-    return (a + b + c) / 3.0f;
-}
+float avg(int a, int b, int c) { return (a + b + c) / 3.0f; }
 
 float avgArr(int count, const int num[]) {
     int sum = 0;
     for (int i = 0; i < count; i++) {
         sum += num[i];
     }
-    return (float) sum / count;
+    return (float)sum / count;
 }
 
-float avgRGBWeighed(int r, int g, int b) {
-    return 0.30f * r + 0.59f * g + 0.11f * b;
-}
+float avgRGBWeighed(int r, int g, int b) { return 0.30f * r + 0.59f * g + 0.11f * b; }
 
 float avgArrWeighed(int count, const int *num, const int *weight) {
     int sumWeight = 0;
@@ -64,22 +61,20 @@ float avgArrWeighed(int count, const int *num, const int *weight) {
         sum += num[i] * weight[i];
         sumWeight += weight[i];
     }
-    return (float) sum / sumWeight;
+    return (float)sum / sumWeight;
 }
 
-int compareInt(const void *a, const void *b) {
-    return *(int *) a - *(int *) b;
-}
+int compareInt(const void *a, const void *b) { return *(int *)a - *(int *)b; }
 
 float medianArr(int count, int num[]) {
     if (1 == count) {
         return num[0];
     }
 
-    qsort(num, (size_t) count, sizeof(int), &compareInt);
+    qsort(num, (size_t)count, sizeof(int), &compareInt);
     if (count % 2 == 0) {
         int m = count / 2;
-        return ((float) num[m - 1] + num[m]) / 2.0f;
+        return ((float)num[m - 1] + num[m]) / 2.0f;
     } else {
         return num[count / 2];
     }
@@ -87,27 +82,27 @@ float medianArr(int count, int num[]) {
 
 int grayValueOfPixel(ScvPixel pxl, SCV_GRAYING_TYPE type) {
     switch (type) {
-        case SCV_GRAYING_R:
-            return pxl.r;
-        case SCV_GRAYING_G:
-            return pxl.g;
-        case SCV_GRAYING_B:
-            return pxl.b;
-        case SCV_GRAYING_MAX:
-            return max(pxl.b, pxl.g, pxl.r);
-        case SCV_GRAYING_AVG:
-            return (int) (avg(pxl.r, pxl.g, pxl.b) + 0.5f);
-        case SCV_GRAYING_W_AVG:
-            return (int) (avgRGBWeighed(pxl.r, pxl.g, pxl.b) + 0.5f);
-        default:
-            return -1;
+    case SCV_GRAYING_R:
+        return pxl.r;
+    case SCV_GRAYING_G:
+        return pxl.g;
+    case SCV_GRAYING_B:
+        return pxl.b;
+    case SCV_GRAYING_MAX:
+        return max(pxl.b, pxl.g, pxl.r);
+    case SCV_GRAYING_AVG:
+        return (int)(avg(pxl.r, pxl.g, pxl.b) + 0.5f);
+    case SCV_GRAYING_W_AVG:
+        return (int)(avgRGBWeighed(pxl.r, pxl.g, pxl.b) + 0.5f);
+    default:
+        return -1;
     }
 }
 
 float thresholdOtsu(const ScvHistogram *hist, int total) {
     // https://en.wikipedia.org/wiki/Otsu%27s_method
     int sum = 0;
-	int i;
+    int i;
     for (i = 1; i < 256; ++i) {
         sum += i * hist->val[i];
     }
@@ -170,18 +165,18 @@ void traceEdge(int y, int x, int nThrLow, ScvUByte *pResult, int *pMag, ScvSize 
 
 #pragma mark - Export
 
-#pragma mark -- Make
+#pragma mark-- Make
 
 ScvImage *scvCreateImage(ScvSize size) {
-    ScvImage *image = (ScvImage *) malloc(sizeof(ScvImage));
+    ScvImage *image = (ScvImage *)malloc(sizeof(ScvImage));
     image->origin = 0;
     image->width = size.width;
     image->height = size.height;
     const int realWidthBytes = image->width * 3;
     image->widthBytes = realWidthBytes % 4 ? ((realWidthBytes >> 2) + 1) << 2 : realWidthBytes;
     const int dataSize = image->widthBytes * image->height;
-    image->data = malloc((size_t) dataSize);
-    memset(image->data, 0, (size_t) dataSize);
+    image->data = malloc((size_t)dataSize);
+    memset(image->data, 0, (size_t)dataSize);
     return image;
 }
 
@@ -196,7 +191,7 @@ void scvCopyImage(const ScvImage *src, ScvImage *dst) {
     dst->width = src->width;
     dst->height = src->height;
     dst->widthBytes = src->widthBytes;
-    memcpy(dst->data, src->data, (size_t) (src->widthBytes * src->height));
+    memcpy(dst->data, src->data, (size_t)(src->widthBytes * src->height));
 }
 
 void scvReleaseImage(ScvImage *image) {
@@ -205,10 +200,10 @@ void scvReleaseImage(ScvImage *image) {
 }
 
 ScvMat *scvCreateMat(int rows, int cols) {
-    ScvMat *mat = (ScvMat *) malloc(sizeof(ScvMat));
+    ScvMat *mat = (ScvMat *)malloc(sizeof(ScvMat));
     mat->rows = rows;
     mat->cols = cols;
-    mat->data = (float *) malloc(rows * cols * sizeof(float));
+    mat->data = (float *)malloc(rows * cols * sizeof(float));
     return mat;
 }
 
@@ -232,9 +227,9 @@ void scvReleaseMat(ScvMat *mat) {
 }
 
 ScvHistogram *scvCreateHist(SCV_GRAYING_TYPE grayingType) {
-    ScvHistogram *histogram = (ScvHistogram *) malloc(sizeof(ScvHistogram));
+    ScvHistogram *histogram = (ScvHistogram *)malloc(sizeof(ScvHistogram));
     histogram->grayingType = grayingType;
-    histogram->val = (int *) malloc(256 * sizeof(int));
+    histogram->val = (int *)malloc(256 * sizeof(int));
     memset(histogram->val, 0, 256 * sizeof(int));
     return histogram;
 }
@@ -255,7 +250,7 @@ void scvReleaseHist(ScvHistogram *histogram) {
     free(histogram);
 }
 
-#pragma mark -- Getter and Setter
+#pragma mark-- Getter and Setter
 
 ScvPixel *scvGetPixelRef(const ScvImage *image, int x, int y) {
     const int w = image->width;
@@ -268,7 +263,7 @@ ScvPixel *scvGetPixelRef(const ScvImage *image, int x, int y) {
     }
 
     // Offer different offset by image.origin
-    return (ScvPixel *) ((char *) image->data + (o ? h - 1 - y : y) * bW + x * 3);
+    return (ScvPixel *)((char *)image->data + (o ? h - 1 - y : y) * bW + x * 3);
 }
 
 ScvPixel scvGetPixel(const ScvImage *image, int x, int y) {
@@ -303,11 +298,9 @@ ScvSize scvGetSize(const ScvImage *image) {
     return size;
 }
 
-ScvPoint scvGetCenter(const ScvImage *image) {
-    return scvPoint(image->width / 2, image->height / 2);
-}
+ScvPoint scvGetCenter(const ScvImage *image) { return scvPoint(image->width / 2, image->height / 2); }
 
-#pragma mark -- Calculator
+#pragma mark-- Calculator
 
 void scvCalcHist(const ScvImage *image, ScvHistogram *hist) {
     memset(hist->val, 0, 256 * sizeof(int));
@@ -322,7 +315,7 @@ void scvCalcHist(const ScvImage *image, ScvHistogram *hist) {
     }
 }
 
-#pragma mark -- Geometrical Transformation
+#pragma mark-- Geometrical Transformation
 
 void scvWarpAffine(const ScvImage *src, ScvImage *dst, const ScvMat *mat, ScvPixel fillPxl) {
     if (!(2 == mat->rows && 3 == mat->cols)) {
@@ -382,12 +375,12 @@ void scvWarpAffine(const ScvImage *src, ScvImage *dst, const ScvMat *mat, ScvPix
             fxO += fxO > 0 ? 0 : -0.5f;
             fyO += fyO > 0 ? 0 : -0.5f;
 
-            scvSetPixel(dst, ix, iy, scvGetPixel(src, (int) fxO, (int) fyO));
+            scvSetPixel(dst, ix, iy, scvGetPixel(src, (int)fxO, (int)fyO));
         }
     }
 
     if (cloned) {
-        scvReleaseImage((ScvImage *) src);
+        scvReleaseImage((ScvImage *)src);
     }
 }
 
@@ -401,7 +394,7 @@ void scvRotationMatrix(ScvPoint center, float angle, ScvMat *mat) {
         return;
     }
 
-    const float rad = (float) (angle / 180 * PI);
+    const float rad = (float)(angle / 180 * PI);
     const float cos = cosf(rad);
     const float sin = sinf(rad);
     const int cx = center.x;
@@ -458,18 +451,18 @@ void scvTranslationMatrix(float dx, float dy, ScvMat *mat) {
 
 void scvFlipMatrix(ScvPoint center, SCV_FLIP_TYPE type, ScvMat *mat) {
     switch (type) {
-        case SCV_FLIP_HORIZONTAL:
-            scvScaleMatrix(center, -1.0f, 1.0f, mat);
-            break;
-        case SCV_FLIP_VERTICAL:
-            scvScaleMatrix(center, 1.0f, -1.0f, mat);
-            break;
-        default:
-            break;
+    case SCV_FLIP_HORIZONTAL:
+        scvScaleMatrix(center, -1.0f, 1.0f, mat);
+        break;
+    case SCV_FLIP_VERTICAL:
+        scvScaleMatrix(center, 1.0f, -1.0f, mat);
+        break;
+    default:
+        break;
     }
 }
 
-#pragma mark -- Point Transformation
+#pragma mark-- Point Transformation
 
 void scvFillImage(ScvImage *image, ScvPixel fillPxl) {
     for (int iy = 0; iy < image->height; iy++) {
@@ -487,7 +480,7 @@ void scvGraying(const ScvImage *src, ScvImage *dst, SCV_GRAYING_TYPE type) {
             if (NULL != dPxlRef) {
                 int value = grayValueOfPixel(sPxl, type);
                 if (value >= 0 && value < 256) {
-                    dPxlRef->b = dPxlRef->g = dPxlRef->r = (ScvUByte) value;
+                    dPxlRef->b = dPxlRef->g = dPxlRef->r = (ScvUByte)value;
                 }
             }
         }
@@ -506,7 +499,7 @@ void scvThreshold(const ScvImage *src, ScvImage *dst, SCV_GRAYING_TYPE grayingTy
             if (NULL != dPxlRef) {
                 int value = grayValueOfPixel(sPxl, grayingType);
                 if (value >= 0 && value < 256) {
-                    dPxlRef->b = dPxlRef->g = dPxlRef->r = (ScvUByte) (value > thresh ? 255 : 0);
+                    dPxlRef->b = dPxlRef->g = dPxlRef->r = (ScvUByte)(value > thresh ? 255 : 0);
                 }
             }
         }
@@ -551,7 +544,7 @@ void scvEqualizeHist(const ScvImage *src, const ScvHistogram *hist, ScvImage *ds
             if (value >= 0 && value < 256) {
                 // Calculate the equalized value
                 // https://en.wikipedia.org/wiki/Histogram_equalization
-                int newVal = (int) (((float) cdf[value] - cdfMin) / (pixelCount - cdfMin) * 255 + 0.5f);
+                int newVal = (int)(((float)cdf[value] - cdfMin) / (pixelCount - cdfMin) * 255 + 0.5f);
                 scvSetPixel(dst, ix, iy, scvPixelAll(newVal));
             }
         }
@@ -564,33 +557,29 @@ void scvSmooth(const ScvImage *src, ScvImage *dst, SCV_SMOOTH_TYPE type) {
      * [i][1] -> dy;
      */
     int step[9][3] = {{-1, -1}, // Top-left
-                      {0,  -1}, // Top
-                      {1,  -1}, // Top-right
+                      {0, -1}, // Top
+                      {1, -1}, // Top-right
                       {-1, 0}, // Left
-                      {0,  0}, // Center
-                      {1,  0}, // Right
+                      {0, 0}, // Center
+                      {1, 0}, // Right
                       {-1, 1}, // Bottom-left
-                      {0,  1}, // Bottom
-                      {1,  1}}; // Bottom-right
+                      {0, 1}, // Bottom
+                      {1, 1}}; // Bottom-right
 
     // Weight template
-    int avgWeight[9] = {1, 1, 1,
-                        1, 1, 1,
-                        1, 1, 1};
-    int gaussianWeight[9] = {1, 2, 1,
-                             2, 4, 2,
-                             1, 2, 1};
+    int avgWeight[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+    int gaussianWeight[9] = {1, 2, 1, 2, 4, 2, 1, 2, 1};
 
     int *weight;
     switch (type) {
-        case SCV_SMOOTH_GAUSSIAN:
-            weight = gaussianWeight;
-            break;
-        case SCV_SMOOTH_AVG:
-        case SCV_SMOOTH_MEDIAN:
-        default:
-            weight = avgWeight;
-            break;
+    case SCV_SMOOTH_GAUSSIAN:
+        weight = gaussianWeight;
+        break;
+    case SCV_SMOOTH_AVG:
+    case SCV_SMOOTH_MEDIAN:
+    default:
+        weight = avgWeight;
+        break;
     }
 
     int r, g, b;
@@ -602,8 +591,7 @@ void scvSmooth(const ScvImage *src, ScvImage *dst, SCV_SMOOTH_TYPE type) {
             for (int i = 0; i < 9; i++) {
                 int curX = ix + step[i][0];
                 int curY = iy + step[i][1];
-                if (curX >= 0 && curX < src->width
-                    && curY >= 0 && curY < src->height) {
+                if (curX >= 0 && curX < src->width && curY >= 0 && curY < src->height) {
                     ScvPixel pxl = scvGetPixel(src, curX, curY);
                     arrR[count] = pxl.r;
                     arrG[count] = pxl.g;
@@ -614,20 +602,20 @@ void scvSmooth(const ScvImage *src, ScvImage *dst, SCV_SMOOTH_TYPE type) {
             }
 
             switch (type) {
-                case SCV_SMOOTH_GAUSSIAN:
-                case SCV_SMOOTH_AVG:
-                    r = (int) (avgArrWeighed(count, arrR, w) + 0.5f);
-                    g = (int) (avgArrWeighed(count, arrG, w) + 0.5f);
-                    b = (int) (avgArrWeighed(count, arrB, w) + 0.5f);
-                    break;
-                case SCV_SMOOTH_MEDIAN:
-                    r = (int) (medianArr(count, arrR) + 0.5f);
-                    g = (int) (medianArr(count, arrG) + 0.5f);
-                    b = (int) (medianArr(count, arrB) + 0.5f);
-                    break;
-                default:
-                    r = g = b = -1;
-                    break;
+            case SCV_SMOOTH_GAUSSIAN:
+            case SCV_SMOOTH_AVG:
+                r = (int)(avgArrWeighed(count, arrR, w) + 0.5f);
+                g = (int)(avgArrWeighed(count, arrG, w) + 0.5f);
+                b = (int)(avgArrWeighed(count, arrB, w) + 0.5f);
+                break;
+            case SCV_SMOOTH_MEDIAN:
+                r = (int)(medianArr(count, arrR) + 0.5f);
+                g = (int)(medianArr(count, arrG) + 0.5f);
+                b = (int)(medianArr(count, arrB) + 0.5f);
+                break;
+            default:
+                r = g = b = -1;
+                break;
             }
             if (r >= 0 && g >= 0 && b >= 0) {
                 scvSetPixel(dst, ix, iy, scvPixel(b, g, r));
@@ -650,35 +638,36 @@ void scvCanny(const ScvImage *image, ScvImage *path) {
     int nWidth = image->width;
     int nHeight = image->height;
 
-    float *P = (float *) malloc(nWidth * nHeight * sizeof(float));
-    float *Q = (float *) malloc(nWidth * nHeight * sizeof(float));
-    int *M = (int *) malloc(nWidth * nHeight * sizeof(int));
-    float *theta = (float *) malloc(nWidth * nHeight * sizeof(float));
+    float *P = (float *)malloc(nWidth * nHeight * sizeof(float));
+    float *Q = (float *)malloc(nWidth * nHeight * sizeof(float));
+    int *M = (int *)malloc(nWidth * nHeight * sizeof(int));
+    float *theta = (float *)malloc(nWidth * nHeight * sizeof(float));
 
     for (iy = 0; iy < nHeight - 1; iy++) {
         for (ix = 0; ix < nWidth - 1; ix++) {
-            P[iy * nWidth + ix] = (scvGetPixel(filtered, MIN(ix + 1, nWidth - 1), iy).r
-                                   - scvGetPixel(filtered, ix, iy).r
-                                   + scvGetPixel(filtered, MIN(ix + 1, nWidth - 1), MIN(iy + 1, nHeight - 1)).r
-                                   - scvGetPixel(filtered, ix, MIN(iy + 1, nHeight - 1)).r) / 2.0f;
-            Q[iy * nWidth + ix] = (scvGetPixel(filtered, ix, iy).r
-                                   - scvGetPixel(filtered, ix, MIN(iy + 1, nHeight - 1)).r
-                                   + scvGetPixel(filtered, MIN(ix + 1, nWidth - 1), iy).r
-                                   - scvGetPixel(filtered, MIN(ix + 1, nWidth - 1), MIN(iy + 1, nHeight - 1)).r) / 2.0f;
+            P[iy * nWidth + ix] =
+                (scvGetPixel(filtered, MIN(ix + 1, nWidth - 1), iy).r - scvGetPixel(filtered, ix, iy).r
+                 + scvGetPixel(filtered, MIN(ix + 1, nWidth - 1), MIN(iy + 1, nHeight - 1)).r
+                 - scvGetPixel(filtered, ix, MIN(iy + 1, nHeight - 1)).r)
+                / 2.0f;
+            Q[iy * nWidth + ix] =
+                (scvGetPixel(filtered, ix, iy).r - scvGetPixel(filtered, ix, MIN(iy + 1, nHeight - 1)).r
+                 + scvGetPixel(filtered, MIN(ix + 1, nWidth - 1), iy).r
+                 - scvGetPixel(filtered, MIN(ix + 1, nWidth - 1), MIN(iy + 1, nHeight - 1)).r)
+                / 2.0f;
         }
     }
 
     for (i = 0; i < nHeight; i++) {
         for (j = 0; j < nWidth; j++) {
-            M[i * nWidth + j] = (int) (
-                    sqrtf(P[i * nWidth + j] * P[i * nWidth + j] + Q[i * nWidth + j] * Q[i * nWidth + j]) + 0.5f);
+            M[i * nWidth + j] =
+                (int)(sqrtf(P[i * nWidth + j] * P[i * nWidth + j] + Q[i * nWidth + j] * Q[i * nWidth + j]) + 0.5f);
             theta[i * nWidth + j] = atan2f(Q[i * nWidth + j], Q[i * nWidth + j]) * 57.3f;
-            if (theta[i * nWidth + j] < 0)
-                theta[i * nWidth + j] += 360;
+            if (theta[i * nWidth + j] < 0) theta[i * nWidth + j] += 360;
         }
     }
 
-    ScvUByte *N = (ScvUByte *) malloc(nWidth * nHeight * sizeof(ScvUByte));
+    ScvUByte *N = (ScvUByte *)malloc(nWidth * nHeight * sizeof(ScvUByte));
     int g1 = 0, g2 = 0, g3 = 0, g4 = 0;
     float dTmp1 = 0.0, dTmp2 = 0.0;
     float dWeight;
@@ -697,15 +686,14 @@ void scvCanny(const ScvImage *image, ScvImage *path) {
             int nPointIdx = i + j * nWidth;
             if (M[nPointIdx] == 0) {
                 N[nPointIdx] = 0;
-            }
-            else {
+            } else {
                 /////////////////////////////////////////////////////
                 /////////       g1  g2                  /////////////
                 /////////           C                   /////////////
                 /////////           g3  g4              /////////////
                 /////////////////////////////////////////////////////
-                if (((theta[nPointIdx] >= 90) && (theta[nPointIdx] < 135)) ||
-                    ((theta[nPointIdx] >= 270) && (theta[nPointIdx] < 315))) {
+                if (((theta[nPointIdx] >= 90) && (theta[nPointIdx] < 135))
+                    || ((theta[nPointIdx] >= 270) && (theta[nPointIdx] < 315))) {
                     g1 = M[nPointIdx - nWidth - 1];
                     g2 = M[nPointIdx - nWidth];
                     g3 = M[nPointIdx + nWidth];
@@ -714,13 +702,13 @@ void scvCanny(const ScvImage *image, ScvImage *path) {
                     dTmp1 = g1 * dWeight + g2 * (1 - dWeight);
                     dTmp2 = g4 * dWeight + g3 * (1 - dWeight);
                 }
-                    /////////////////////////////////////////////////////
-                    /////////       g1                      /////////////
-                    /////////       g2  C   g3              /////////////
-                    /////////               g4              /////////////
-                    /////////////////////////////////////////////////////
-                else if (((theta[nPointIdx] >= 135) && (theta[nPointIdx] < 180)) ||
-                         ((theta[nPointIdx] >= 315) && (theta[nPointIdx] < 360))) {
+                /////////////////////////////////////////////////////
+                /////////       g1                      /////////////
+                /////////       g2  C   g3              /////////////
+                /////////               g4              /////////////
+                /////////////////////////////////////////////////////
+                else if (((theta[nPointIdx] >= 135) && (theta[nPointIdx] < 180))
+                         || ((theta[nPointIdx] >= 315) && (theta[nPointIdx] < 360))) {
                     g1 = M[nPointIdx - nWidth - 1];
                     g2 = M[nPointIdx - 1];
                     g3 = M[nPointIdx + 1];
@@ -729,13 +717,13 @@ void scvCanny(const ScvImage *image, ScvImage *path) {
                     dTmp1 = g2 * dWeight + g1 * (1 - dWeight);
                     dTmp2 = g4 * dWeight + g3 * (1 - dWeight);
                 }
-                    /////////////////////////////////////////////////////
-                    /////////           g1  g2              /////////////
-                    /////////           C                   /////////////
-                    /////////       g4  g3                  /////////////
-                    /////////////////////////////////////////////////////
-                else if (((theta[nPointIdx] >= 45) && (theta[nPointIdx] < 90)) ||
-                         ((theta[nPointIdx] >= 225) && (theta[nPointIdx] < 270))) {
+                /////////////////////////////////////////////////////
+                /////////           g1  g2              /////////////
+                /////////           C                   /////////////
+                /////////       g4  g3                  /////////////
+                /////////////////////////////////////////////////////
+                else if (((theta[nPointIdx] >= 45) && (theta[nPointIdx] < 90))
+                         || ((theta[nPointIdx] >= 225) && (theta[nPointIdx] < 270))) {
                     g1 = M[nPointIdx - nWidth];
                     g2 = M[nPointIdx - nWidth + 1];
                     g3 = M[nPointIdx + nWidth];
@@ -744,13 +732,13 @@ void scvCanny(const ScvImage *image, ScvImage *path) {
                     dTmp1 = g2 * dWeight + g1 * (1 - dWeight);
                     dTmp2 = g3 * dWeight + g4 * (1 - dWeight);
                 }
-                    /////////////////////////////////////////////////////
-                    /////////               g1              /////////////
-                    /////////       g4  C   g2              /////////////
-                    /////////       g3                      /////////////
-                    /////////////////////////////////////////////////////
-                else if (((theta[nPointIdx] >= 0) && (theta[nPointIdx] < 45)) ||
-                         ((theta[nPointIdx] >= 180) && (theta[nPointIdx] < 225))) {
+                /////////////////////////////////////////////////////
+                /////////               g1              /////////////
+                /////////       g4  C   g2              /////////////
+                /////////       g3                      /////////////
+                /////////////////////////////////////////////////////
+                else if (((theta[nPointIdx] >= 0) && (theta[nPointIdx] < 45))
+                         || ((theta[nPointIdx] >= 180) && (theta[nPointIdx] < 225))) {
                     g1 = M[nPointIdx - nWidth + 1];
                     g2 = M[nPointIdx + 1];
                     g3 = M[nPointIdx + nWidth - 1];
@@ -762,8 +750,7 @@ void scvCanny(const ScvImage *image, ScvImage *path) {
             }
             if ((M[nPointIdx] >= dTmp1) && (M[nPointIdx] >= dTmp2)) {
                 N[nPointIdx] = 128;
-            }
-            else {
+            } else {
                 N[nPointIdx] = 0;
             }
         }
@@ -779,8 +766,7 @@ void scvCanny(const ScvImage *image, ScvImage *path) {
     }
     for (i = 0; i < nHeight; i++) {
         for (j = 0; j < nWidth; j++) {
-            if (N[i * nWidth + j] == 128)
-                nHist[M[i * nWidth + j]]++;
+            if (N[i * nWidth + j] == 128) nHist[M[i * nWidth + j]]++;
         }
     }
 
@@ -797,7 +783,7 @@ void scvCanny(const ScvImage *image, ScvImage *path) {
     float dThrHigh;
     float dThrLow;
     float dRatLow = 0.5;
-    nHighCount = (int) (dRatHigh * nEdgeNum + 0.5f);
+    nHighCount = (int)(dRatHigh * nEdgeNum + 0.5f);
     j = 1;
     nEdgeNum = nHist[1];
     while ((j < (nMaxMag - 1)) && (nEdgeNum < nHighCount)) {
@@ -805,7 +791,7 @@ void scvCanny(const ScvImage *image, ScvImage *path) {
         nEdgeNum += nHist[j];
     }
     dThrHigh = j;
-    dThrLow = (int) ((dThrHigh) * dRatLow + 0.5f);
+    dThrLow = (int)((dThrHigh)*dRatLow + 0.5f);
 
     ScvSize sz;
     sz.width = nWidth;
@@ -814,7 +800,7 @@ void scvCanny(const ScvImage *image, ScvImage *path) {
         for (j = 0; j < nWidth; j++) {
             if ((N[i * nWidth + j] == 128) && (M[i * nWidth + j] >= dThrHigh)) {
                 N[i * nWidth + j] = 255;
-                traceEdge(i, j, (int) (dThrLow + 0.5f), N, M, sz);
+                traceEdge(i, j, (int)(dThrLow + 0.5f), N, M, sz);
             }
         }
     }
@@ -846,15 +832,16 @@ void scvAddWeighed(const ScvImage *src1, float alpha, const ScvImage *src2, floa
 
     for (int iy = 0; iy < dst->height; iy++) {
         for (int ix = 0; ix < dst->width; ix++) {
-            if (ix < src1->width && iy < src1->height
-                && ix < src2->width && iy < src2->height) {
+            if (ix < src1->width && iy < src1->height && ix < src2->width && iy < src2->height) {
                 // In range of both src1 and src2
                 ScvPixel pxl1 = scvGetPixel(src1, ix, iy);
                 ScvPixel pxl2 = scvGetPixel(src2, ix, iy);
-                scvSetPixel(dst, ix, iy, scvPixel(
-                        (int) (alpha * pxl1.b + beta * pxl2.b),
-                        (int) (alpha * pxl1.g + beta * pxl2.g),
-                        (int) (alpha * pxl1.r + beta * pxl2.r)));
+                scvSetPixel(dst,
+                            ix,
+                            iy,
+                            scvPixel((int)(alpha * pxl1.b + beta * pxl2.b),
+                                     (int)(alpha * pxl1.g + beta * pxl2.g),
+                                     (int)(alpha * pxl1.r + beta * pxl2.r)));
             } else if (ix < src1->width && iy < src1->height) {
                 // In range of src1
                 scvSetPixel(dst, ix, iy, scvGetPixel(src1, ix, iy));
